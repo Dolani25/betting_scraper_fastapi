@@ -22,12 +22,12 @@ RUN apt-get update && apt-get install -y \
 
 # Install ChromeDriver
 # Get the installed Chrome version
-RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+') && \
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP \'\\d+\\.\\d+\\.\\d+\\.\\d+\') && \
     echo "Detected Chrome Version: $CHROME_VERSION" && \
     # Extract major version
-    CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d'.' -f1) && \
+    CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d\'.\' -f1) && \
     echo "Detected Chrome Major Version: $CHROME_MAJOR_VERSION" && \
-    # Get the corresponding ChromeDriver version URL from the Chrome for Testing API
+    # Get the corresponding ChromeDriver version URL
     CHROMEDRIVER_VERSION_URL=$(curl -sS "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | \
     jq -r ".channels.Stable.version") && \
     echo "Detected ChromeDriver Version URL: $CHROMEDRIVER_VERSION_URL" && \
