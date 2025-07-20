@@ -4,6 +4,9 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
+# Install jq first (required for parsing JSON response from Chrome for Testing API)
+RUN apt-get update && apt-get install -y jq
+
 # Install system dependencies for Chrome and Selenium
 RUN apt-get update && apt-get install -y \
     wget \
@@ -18,13 +21,22 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install ChromeDriver
-RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
-    mkdir -p /opt/chromedriver-$CHROMEDRIVER_VERSION && \
-    curl -sS -o /tmp/chromedriver_linux64.zip http://chromedriver.storage.googleapis.com/LATEST_RELEASE/chromedriver_linux64.zip && \
-    unzip -qq /tmp/chromedriver_linux64.zip -d /opt/chromedriver-$CHROMEDRIVER_VERSION && \
-    rm /tmp/chromedriver_linux64.zip && \
-    chmod +x /opt/chromedriver-$CHROMEDRIVER_VERSION/chromedriver && \
-    ln -fs /opt/chromedriver-$CHROMEDRIVER_VERSION/chromedriver /usr/local/bin/chromedriver
+# Get the installed Chrome version
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+') && \
+    echo "Detected Chrome Version: $CHROME_VERSION" && \
+    # Extract major version
+    CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d'.' -f1) && \
+    echo "Detected Chrome Major Version: $CHROME_MAJOR_VERSION" && \
+    # Get the corresponding ChromeDriver version URL from the Chrome for Testing API
+    CHROMEDRIVER_VERSION_URL=$(curl -sS "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | \
+    jq -r ".channels.Stable.version") && \
+    echo "Detected ChromeDriver Version URL: $CHROMEDRIVER_VERSION_URL" && \
+    # Download ChromeDriver
+    wget -q --continue -P /tmp/ "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION_URL/linux64/chromedriver-linux64.zip" && \
+    unzip -qq /tmp/chromedriver-linux64.zip -d /opt/ && \
+    mv /opt/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
+    rm -rf /opt/chromedriver-linux64 /tmp/chromedriver-linux64.zip && \
+    chmod +x /usr/local/bin/chromedriver
 
 # Copy application files
 COPY . .
