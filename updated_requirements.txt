@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-selenium
-beautifulsoup4
-requests
-pydantic
-
