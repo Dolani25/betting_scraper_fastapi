@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 from typing import Dict, Optional
 import json
-from scraper import scrape_all_sites
+from main import scrape_all_sites
 
 app = FastAPI(title="Betting Scraper API", description="API for scraping betting site histories")
 
