@@ -330,7 +330,9 @@ def scrape_all_sites(credentials):
     logger.info("All betting history saved to all_betting_history.json")
     return all_bet_history
 
-# Example usage
+
+"""
+Example usage
 if __name__ == "__main__":
     # Define credentials for all sites
     credentials = {
@@ -351,4 +353,5 @@ if __name__ == "__main__":
     # Scrape all sites
     result = scrape_all_sites(credentials)
     print("Scraping completed. Check all_betting_history.json for results.")
+"""
 
